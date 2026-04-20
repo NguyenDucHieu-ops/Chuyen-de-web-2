@@ -1,0 +1,67 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "AuditServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.audit_service.AuditServiceApplication",
+            "projectName": "audit-service"
+        },
+        {
+            "type": "java",
+            "name": "PaymentServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.payment_service.PaymentServiceApplication",
+            "projectName": "payment-service"
+        },
+        {
+            "type": "java",
+            "name": "EurekaServerApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.eurekaserver.EurekaServerApplication",
+            "projectName": "eureka-server"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "ApiGatewayApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.apigateway.ApiGatewayApplication",
+            "projectName": "api-gateway"
+        },
+        {
+            "type": "java",
+            "name": "OrderServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.orderservice.OrderServiceApplication",
+            "projectName": "order-service"
+        },
+        {
+            "type": "java",
+            "name": "ProductCatalogServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.productcatalogservice.ProductCatalogServiceApplication",
+            "projectName": "product-catalog-service"
+        },
+        {
+            "type": "java",
+            "name": "ProductRecommendationServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.recommendationservice.ProductRecommendationServiceApplication",
+            "projectName": "product-recommendation-service"
+        },
+        {
+            "type": "java",
+            "name": "UserServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.userservice.UserServiceApplication",
+            "projectName": "user-service"
+        }
+    ]
+}
