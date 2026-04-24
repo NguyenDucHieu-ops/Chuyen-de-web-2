@@ -8,78 +8,47 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table (name = "items")
-@EqualsAndHashCode
+@Table(name = "items")
+@Data // Tự động tạo Getter, Setter, ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class Item {
-	
-    @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
-    @JsonIgnore
-    private Long id;
 
-    @Column (name = "quantity")
-    @NotNull
-    private int quantity;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonIgnore
+	private Long id;
 
-    @Column (name = "subtotal")
-    @NotNull
-    private BigDecimal subTotal;
+	@Column(name = "quantity")
+	@NotNull
+	private int quantity;
 
-    @ManyToOne (cascade = CascadeType.ALL)
-    @JoinColumn (name = "product_id")
-    private Product product;
+	@Column(name = "subtotal")
+	@NotNull
+	private BigDecimal subTotal;
 
-    @ManyToMany (mappedBy = "items")
-    @JsonIgnore
-    private List<Order> orders;
-    
-    public Item() {
-    	
-    }
+	// Các trường lưu thông tin sản phẩm tại thời điểm mua
+	private String productName;
+	private BigDecimal productPrice;
 
-    public Item(@NotNull int quantity, Product product, BigDecimal subTotal) {
-        this.quantity = quantity;
-        this.product = product;
-        this.subTotal = subTotal;
-    }
+	// ✅ CẢI TIẾN QUAN TRỌNG: Ép kiểu TEXT để không bao giờ bị lỗi "Data too long"
+	@Column(columnDefinition = "TEXT")
+	private String productImageUrl;
 
-	public Long getId() {
-		return id;
-	}
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "product_id")
+	private Product product;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	@ManyToMany(mappedBy = "items")
+	@JsonIgnore
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
+	private List<Order> orders;
 
-	public int getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(int quantity) {
+	// Constructor phục vụ việc tạo Item nhanh
+	public Item(@NotNull int quantity, Product product, BigDecimal subTotal) {
 		this.quantity = quantity;
-	}
-
-	public BigDecimal getSubTotal() {
-		return subTotal;
-	}
-
-	public void setSubTotal(BigDecimal subTotal) {
-		this.subTotal = subTotal;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
 		this.product = product;
-	}
-
-	public List<Order> getOrders() {
-		return orders;
-	}
-
-	public void setOrders(List<Order> orders) {
-		this.orders = orders;
+		this.subTotal = subTotal;
 	}
 }

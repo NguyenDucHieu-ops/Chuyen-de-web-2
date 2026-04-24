@@ -16,24 +16,32 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-// ✅ ĐÃ XÓA @RequestMapping để Gateway StripPrefix khớp trực tiếp
 public class PaymentController {
 
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @GetMapping("/all")
+    public ResponseEntity<List<Transaction>> getAllPayments() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        return ResponseEntity.ok(transactions);
+    }
+
     @GetMapping("/create-vnpay-link")
     public ResponseEntity<?> createPayment(
-            @RequestParam("amount") long amount,
+            @RequestParam("amount") double amount, // ✅ Sửa thành double để nhận số lẻ từ React
             @RequestParam("orderId") String orderId) {
 
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", VNPAYConfig.vnp_Version);
         vnp_Params.put("vnp_Command", VNPAYConfig.vnp_Command);
         vnp_Params.put("vnp_TmnCode", VNPAYConfig.vnp_TmnCode);
-        // Trong PaymentController.java
-        // Sửa dòng này để ép số tiền lên mức tối thiểu của Sandbox (ví dụ 100,000 VND)
-        vnp_Params.put("vnp_Amount", String.valueOf(amount * 100 * 35000)); // Nhân thêm tỷ giá để ra tiền Việt
+
+        // ✅ CÔNG THỨC CHUẨN: (Giá USD * Tỷ giá 25000) * 100
+        // Ví dụ: $1.5 -> (1.5 * 25000) * 100 = 3,750,000 (VNPAY sẽ hiển thị 37,500 VNĐ)
+        long vnpayAmount = (long) (amount * 25000 * 100);
+
+        vnp_Params.put("vnp_Amount", String.valueOf(vnpayAmount));
         vnp_Params.put("vnp_CurrCode", "VND");
         vnp_Params.put("vnp_TxnRef", orderId + "_" + System.currentTimeMillis());
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang: " + orderId);
@@ -69,7 +77,8 @@ public class PaymentController {
             }
         }
         String queryUrl = query.toString();
-        String vnp_SecureHash = VNPAYConfig.hmacSHA512(VNPAYConfig.vnp_HashSecret, hashData.toString());
+        String vnp_HashSecret = VNPAYConfig.vnp_HashSecret;
+        String vnp_SecureHash = VNPAYConfig.hmacSHA512(vnp_HashSecret, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = VNPAYConfig.vnp_PayUrl + "?" + queryUrl;
 
@@ -91,8 +100,7 @@ public class PaymentController {
         fields.remove("vnp_SecureHashType");
         fields.remove("vnp_SecureHash");
 
-        // Tính toán lại mã băm để so sánh
-        String signValue = VNPAYConfig.hashAllFields(fields); // Em cần thêm hàm hashAllFields vào VNPAYConfig
+        String signValue = VNPAYConfig.hashAllFields(fields);
 
         if (signValue.equals(vnp_SecureHash)) {
             if ("00".equals(request.getParameter("vnp_ResponseCode"))) {

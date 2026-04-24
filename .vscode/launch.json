@@ -3,6 +3,41 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ContactServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.contact_service.ContactServiceApplication",
+            "projectName": "contact-service"
+        },
+        {
+            "type": "java",
+            "name": "ArticleServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.article_service.ArticleServiceApplication",
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "RewardServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.reward_service.RewardServiceApplication",
+            "projectName": "reward-service"
+        },
+        {
+            "type": "java",
+            "name": "ReviewServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.review_service.ReviewServiceApplication",
+            "projectName": "review-service"
+        },
+        {
+            "type": "java",
+            "name": "MinigameServiceApplication",
+            "request": "launch",
+            "mainClass": "com.rainbowforest.minigame_service.MinigameServiceApplication",
+            "projectName": "minigame-service"
+        },
+        {
+            "type": "java",
             "name": "AuditServiceApplication",
             "request": "launch",
             "mainClass": "com.rainbowforest.audit_service.AuditServiceApplication",

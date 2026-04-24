@@ -48,26 +48,34 @@ public class OrderController {
         try {
             Order order = new Order();
 
-            // 1. Lấy và gán User (Chìa khóa để hiện lịch sử đơn hàng thật)
+            // ✅ 1. LẤY THÔNG TIN TỪ PAYLOAD VÀ LƯU VÀO ENTITY (Sửa lỗi N/A)
+            if (payload.get("customerName") != null)
+                order.setCustomerName((String) payload.get("customerName"));
+            if (payload.get("phoneNumber") != null)
+                order.setPhoneNumber((String) payload.get("phoneNumber"));
+            if (payload.get("shippingAddress") != null)
+                order.setShippingAddress((String) payload.get("shippingAddress"));
+            if (payload.get("paymentMethod") != null)
+                order.setPaymentMethod((String) payload.get("paymentMethod"));
+
+            // 2. Lấy và gán User
             if (payload.get("userName") != null) {
                 String userName = (String) payload.get("userName");
-                System.out.println("Hệ thống: Đang truy vấn User - " + userName);
-
                 User user = userClient.getUserByName(userName);
                 if (user != null) {
                     order.setUser(user);
-                    System.out.println("✅ Thành công: Đã gán User ID " + user.getId() + " vào đơn hàng.");
-                } else {
-                    System.out.println("❌ Thất bại: Không tìm thấy User '" + userName + "' trong Database.");
+                    order.setUserName(userName);
                 }
             }
 
-            // 2. Thiết lập thông tin đơn hàng
-            order.setTotal(new BigDecimal(payload.get("total").toString()));
+            // 3. Thiết lập thông tin đơn hàng
+            if (payload.get("total") != null) {
+                order.setTotal(new BigDecimal(payload.get("total").toString()));
+            }
             order.setOrderedDate(LocalDate.now());
             order.setStatus("PENDING");
 
-            // 3. Xử lý danh sách sản phẩm
+            // 4. Xử lý danh sách sản phẩm
             List<Map<String, Object>> itemsRaw = (List<Map<String, Object>>) payload.get("items");
             List<Item> items = new ArrayList<>();
 
@@ -80,15 +88,24 @@ public class OrderController {
                     if (product != null) {
                         item.setProduct(product);
                         item.setQuantity((Integer) itemData.get("quantity"));
-                        item.setSubTotal(new BigDecimal(itemData.get("productPrice").toString())
-                                .multiply(new BigDecimal(item.getQuantity())));
+
+                        // ✅ LƯU TÊN, ẢNH VÀ GIÁ VÀO BẢNG ITEM ĐỂ HIỆN LỊCH SỬ (Sửa lỗi 0đ)
+                        if (itemData.get("productName") != null)
+                            item.setProductName((String) itemData.get("productName"));
+                        if (itemData.get("productImageUrl") != null)
+                            item.setProductImageUrl((String) itemData.get("productImageUrl"));
+                        if (itemData.get("productPrice") != null) {
+                            BigDecimal price = new BigDecimal(itemData.get("productPrice").toString());
+                            item.setProductPrice(price);
+                            item.setSubTotal(price.multiply(new BigDecimal(item.getQuantity())));
+                        }
                         items.add(item);
                     }
                 }
             }
             order.setItems(items);
 
-            // 4. Lưu vào Database
+            // 5. Lưu vào Database
             Order savedOrder = orderService.saveOrder(order);
 
             return new ResponseEntity<>(savedOrder,
