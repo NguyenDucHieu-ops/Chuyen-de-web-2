@@ -39,7 +39,20 @@ public class Product {
 	@JsonProperty("imageUrl")
 	private String imageUrl;
 
+	// ✅ ĐÃ THÊM: Map với cột specifications dưới MySQL
+	@Column(name = "specifications", columnDefinition = "JSON")
+	private String specifications;
+
 	public Product() {
+	}
+
+	// ✅ ĐÃ THÊM: Getter và Setter cho specifications
+	public String getSpecifications() {
+		return specifications;
+	}
+
+	public void setSpecifications(String specifications) {
+		this.specifications = specifications;
 	}
 
 	public String getImageUrl() {

@@ -2,6 +2,7 @@ package com.rainbowforest.review_service.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonProperty; // ✅ THÊM THƯ VIỆN NÀY
 
 @Entity
 @Table(name = "reviews")
@@ -11,7 +12,12 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ✅ Ép Spring Boot đọc chữ "productId" từ React và lưu vào cột "product_id"
+    // trong MySQL
+    @JsonProperty("productId")
+    @Column(name = "product_id")
     private Long productId;
+
     private String userName;
     private int rating;
 

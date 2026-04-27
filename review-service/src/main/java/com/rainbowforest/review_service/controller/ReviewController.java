@@ -10,12 +10,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reviews")
+@CrossOrigin("*") // Mở toang cửa cho Frontend
 public class ReviewController {
 
     @Autowired
     private ReviewRepository reviewRepository;
 
-    // ✅ THÊM HÀM NÀY ĐỂ HIỆN ĐÁNH GIÁ RA TRANG CHỦ (HẾT LỖI 405)
     @GetMapping
     public ResponseEntity<List<Review>> getAllReviews() {
         return ResponseEntity.ok(reviewRepository.findAll());
@@ -26,10 +26,18 @@ public class ReviewController {
         return ResponseEntity.ok(reviewRepository.findByProductIdOrderByCreatedAtDesc(productId));
     }
 
+    // 🔥 CHIÊU CUỐI: Hút ID thẳng từ đường dẫn URL (?productId=...)
     @PostMapping
-    public ResponseEntity<?> addReview(@RequestBody Review review,
+    public ResponseEntity<?> addReview(
+            @RequestParam(value = "productId", required = false) Long paramProductId,
+            @RequestBody Review review,
             @RequestHeader(value = "X-User-Name", required = false) String userName) {
         try {
+            // Ép cứng ID vào sản phẩm (Đố thằng nào làm NULL được nữa)
+            if (paramProductId != null) {
+                review.setProductId(paramProductId);
+            }
+
             if (userName != null && !userName.isEmpty()) {
                 review.setUserName(userName);
             } else if (review.getUserName() == null) {

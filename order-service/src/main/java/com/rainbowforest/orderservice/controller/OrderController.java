@@ -8,6 +8,10 @@ import com.rainbowforest.orderservice.feignclient.UserClient;
 import com.rainbowforest.orderservice.feignclient.ProductClient;
 import com.rainbowforest.orderservice.http.header.HeaderGenerator;
 import com.rainbowforest.orderservice.service.OrderService;
+import com.rainbowforest.orderservice.service.PdfExportService;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
+import com.rainbowforest.orderservice.service.PdfExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -125,5 +129,28 @@ public class OrderController {
             return new ResponseEntity<>(order, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @Autowired
+    private PdfExportService pdfExportService;
+
+    // ✅ API ĐỂ REACT GỌI XUẤT FILE PDF
+    @GetMapping(value = "/orders/{id}/export-pdf", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> exportOrderPdf(@PathVariable("id") Long id) {
+        Order order = orderService.getOrderById(id);
+        if (order == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Gọi cỗ máy vẽ PDF
+        byte[] pdfBytes = pdfExportService.generateOrderPdf(order);
+
+        // Đóng gói file gửi về Frontend
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "Hoa_Don_FixtStore_" + id + ".pdf");
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 }
